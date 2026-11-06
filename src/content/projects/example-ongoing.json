@@ -1,0 +1,9 @@
+{
+  "name": "示例进行中项目（请替换）",
+  "description": "【示例/请替换】用于验证进行中项目优先排序。",
+  "tech_stack": ["PyTorch（示例）", "多模态推荐（示例）"],
+  "repo_url": "https://example.com/projects/ongoing",
+  "demo_url": "",
+  "start_year": 2023,
+  "end_year": null
+}

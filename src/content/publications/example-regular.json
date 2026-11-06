@@ -1,0 +1,9 @@
+{
+  "title": "示例普通论文（请替换）",
+  "authors": ["示例作者丙（请替换）"],
+  "venue": "示例会议 B（请替换）",
+  "year": 2025,
+  "paper_url": "https://example.com/papers/regular-demo",
+  "code_url": "https://example.com/code/regular-demo",
+  "selected": false
+}

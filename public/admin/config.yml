@@ -1,0 +1,311 @@
+# 认证方式：Sveltia CMS 使用 GitHub Personal Access Token（PAT）登录，不需要额外部署 OAuth 代理。
+# 目标 CMS：Sveltia CMS
+# 项目位置：public/admin/config.yml
+
+backend:
+  name: github
+  repo: ablacktangerine/mywebsite
+  branch: main
+  auth_methods:
+    - token
+
+# 保存后直接提交到配置的分支，由部署工作流更新公开站点。
+publish_mode: simple
+
+# 媒体文件设置。
+# public_folder 按 GitHub Pages 项目站点 /mywebsite 配置。
+media_folder: public/uploads
+public_folder: /mywebsite/uploads
+
+collections:
+  # ------------------------------------------------------------
+  # Publications：每篇论文一个 JSON 文件
+  # ------------------------------------------------------------
+  - name: publications
+    label: 论文发表
+    label_singular: 论文
+    folder: src/content/publications
+    format: json
+    extension: json
+    create: true
+    delete: true
+
+    identifier_field: title
+
+    # 标题用于可读文件名，随机后缀降低重名冲突风险。
+    slug: "{{slug}}-{{uuid_short}}"
+
+    summary: "{{year}} · {{title}} · {{venue}}"
+
+    # 仅控制 CMS 后台列表，默认按年份倒序。
+    sortable_fields:
+      - field: year
+        label: 年份
+        default_sort: desc
+      - title
+      - venue
+      - selected
+
+    editor:
+      preview: false
+
+    fields:
+      - name: title
+        label: 论文标题
+        widget: string
+        required: true
+        default: ""
+
+      - name: authors
+        label: 作者
+        label_singular: 作者
+        widget: list
+        required: true
+        min: 1
+        default: []
+        hint: 按论文署名顺序填写，每项一位作者。
+        field:
+          name: author
+          label: 作者姓名
+          widget: string
+          required: true
+
+      - name: venue
+        label: 会议 / 期刊
+        widget: string
+        required: true
+        default: ""
+
+      - name: year
+        label: 发表年份
+        widget: number
+        value_type: int
+        required: true
+        min: 1900
+        max: 2100
+        step: 1
+        default: 2026
+
+      - name: paper_url
+        label: 论文链接
+        widget: string
+        type: url
+        required: false
+        default: ""
+        hint: 填写完整 URL；尚无公开链接时可留空。
+
+      - name: code_url
+        label: 代码链接
+        widget: string
+        type: url
+        required: false
+        default: ""
+
+      - name: selected
+        label: 精选论文
+        widget: boolean
+        required: false
+        default: false
+        hint: 用于精选展示；未勾选的论文仍会公开显示。
+
+  # ------------------------------------------------------------
+  # Projects：每个项目一个 JSON 文件
+  # ------------------------------------------------------------
+  - name: projects
+    label: 项目经历
+    label_singular: 项目
+    folder: src/content/projects
+    format: json
+    extension: json
+    create: true
+    delete: true
+
+    # 项目没有 title 字段，使用 name 作为条目标识。
+    identifier_field: name
+    slug: "{{slug}}-{{uuid_short}}"
+
+    summary: "{{name}} · {{start_year}}"
+
+    # 后台默认按开始年份倒序。
+    sortable_fields:
+      - field: start_year
+        label: 开始年份
+        default_sort: desc
+      - name
+      - end_year
+
+    editor:
+      preview: false
+
+    fields:
+      - name: name
+        label: 项目名称
+        widget: string
+        required: true
+        default: ""
+
+      - name: description
+        label: 项目描述
+        widget: text
+        required: true
+        default: ""
+        hint: 可填写研究问题、个人工作和项目成果，支持换行。
+
+      - name: tech_stack
+        label: 技术栈 / 方法
+        label_singular: 技术或方法
+        widget: list
+        required: true
+        min: 1
+        default: []
+        hint: 每项填写一个技术或方法，例如 PyTorch、多模态融合。
+        field:
+          name: technology
+          label: 技术或方法
+          widget: string
+          required: true
+
+      - name: repo_url
+        label: 项目仓库链接
+        widget: string
+        type: url
+        required: false
+        default: ""
+
+      - name: demo_url
+        label: 在线演示链接
+        widget: string
+        type: url
+        required: false
+        default: ""
+
+      - name: start_year
+        label: 开始年份
+        widget: number
+        value_type: int
+        required: true
+        min: 1900
+        max: 2100
+        step: 1
+        default: 2026
+
+      - name: end_year
+        label: 结束年份
+        widget: number
+        value_type: int
+        required: false
+        min: 1900
+        max: 2100
+        step: 1
+        # 不设置显式 default：默认留空，保存为 null。
+        hint: 留空表示进行中；填写时应大于或等于开始年份。
+
+  # ------------------------------------------------------------
+  # News：每条动态一个 JSON 文件
+  # ------------------------------------------------------------
+  - name: news
+    label: 最新动态
+    label_singular: 动态
+    folder: src/content/news
+    format: json
+    extension: json
+    create: true
+    delete: true
+
+    identifier_field: content
+
+    # 不使用正文生成文件名，避免文件名过长。
+    # 日期取自 date 字段，随机后缀允许同一天新增多条动态。
+    slug: "{{year}}-{{month}}-{{day}}-{{uuid_short}}"
+
+    summary: "{{date}} · {{content}}"
+
+    sortable_fields:
+      - field: date
+        label: 日期
+        default_sort: desc
+      - content
+
+    editor:
+      preview: false
+
+    fields:
+      - name: date
+        label: 日期
+        widget: datetime
+        type: date
+        required: true
+        default: "{{now}}"
+        hint: 仅保存日期，格式为 YYYY-MM-DD。
+
+      - name: content
+        label: 动态内容
+        widget: text
+        required: true
+        default: ""
+        hint: 填写一条简短动态，例如论文接收、项目发布或学术交流。
+
+  # ------------------------------------------------------------
+  # Profile：固定文件单例
+  # ------------------------------------------------------------
+  - name: profile
+    label: 个人资料
+
+    # files 集合只允许编辑预定义文件。
+    # 这里只有一个文件，因此不能新增或删除其他个人资料。
+    files:
+      - name: profile
+        label: 基本信息与联系方式
+        file: src/content/profile.json
+        format: json
+
+        editor:
+          preview: false
+
+        fields:
+          - name: name
+            label: 姓名
+            widget: string
+            required: true
+            default: "示例同学（请替换）"
+
+          - name: title
+            label: 一句话定位
+            widget: string
+            required: true
+            default: "计算机技术方向在读研究生（示例，请替换）"
+
+          - name: affiliation
+            label: 所属院校 / 机构
+            widget: string
+            required: true
+            default: "示例大学 · 示例学院（请替换）"
+
+          - name: bio
+            label: 个人简介与研究兴趣
+            widget: text
+            required: true
+            default: "【虚构占位】我是一名在读研究生，关注人工智能、多模态推荐与大模型。请替换为你的真实简介。"
+
+          - name: email
+            label: 联系邮箱
+            widget: string
+            type: email
+            required: true
+            default: "student@example.com"
+
+          - name: github
+            label: GitHub 主页
+            widget: string
+            type: url
+            required: false
+            default: ""
+            hint: 填写完整 GitHub 主页 URL。
+
+          - name: scholar_url
+            label: Google Scholar 主页
+            widget: string
+            type: url
+            required: false
+            default: ""
+            hint: 填写完整 Google Scholar 个人主页 URL。

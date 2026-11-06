@@ -1,0 +1,9 @@
+{
+  "name": "示例已完成项目（请替换）",
+  "description": "【示例/请替换】用于验证已完成项目排在进行中项目之后。",
+  "tech_stack": ["Python（示例）", "大模型（示例）"],
+  "repo_url": "https://example.com/projects/completed",
+  "demo_url": "https://example.com/demos/completed",
+  "start_year": 2025,
+  "end_year": 2025
+}
